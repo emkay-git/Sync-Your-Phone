@@ -28,7 +28,7 @@ the files.</i>
 </p>
 
 ## Usage
-1. Run the python script on the server side as `python songClient.py`. Keep it in the same folder which will act as shared folder.
+1. Run the python script on the server side as `python songClient.py`. Keep it in the same folder which will act as shared folder. To run the script in background and on your system startup, you can use [upstart](https://stackoverflow.com/questions/24518522/run-python-script-at-startup-in-ubuntu).
 2. Install the app in your phone through android studio. (Right now not avaible on playstore.)
 
 ## Suggested Improvement(s)
