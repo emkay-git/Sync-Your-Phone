@@ -5,21 +5,79 @@ import os
 from os import listdir
 from os.path import isfile, join
 import json
+import subprocess,struct
+
+
+def getMachineIPAddress():
+    #connecting with google nameserver and then finding ip of this machine.
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.connect(("8.8.8.8", 80))
+    ip =  s.getsockname()[0]
+    s.close()
+    return ip
+    
+
+def getNetworkAddress():
+    #string manipulation to get subnet
+    machineIp = getMachineIPAddress()
+    index = machineIp.rfind('.')
+    networkAddress = machineIp[:index+1]
+    return networkAddress
+
+
+def getActiveIPAddress():
+    #using nmap and run it in the shell, which gives the active devices in the network. Then some
+    # string manipulation to get the ip address of those active devices.
+    networkAddress = getNetworkAddress()
+    proc=subprocess.Popen('nmap -sP '+networkAddress+'0/24', shell=True, stdout=subprocess.PIPE, )
+    output=proc.communicate()[0]
+    print output
+    activeIp = []
+    outputArray = output.split('\n')
+    for out in outputArray:
+        if out.startswith("Nmap scan report for"):
+            ipOutputArray = out.split(' ')
+            ipOutput = ipOutputArray[len(ipOutputArray)-1]
+            if ipOutput.endswith(')') and ipOutput.startswith('('):
+                ipOutput = ipOutput[1:len(ipOutput)-1]
+            activeIp.append(ipOutput)
+    return activeIp
 
 
 def sendFileToPhone(mp3files,serversocket):
     
-    #ip address of your phone where you wish to send the files.
-    host = "192.168.23.21"  
-    #                     
-    port = 9998  
 
-    serversocket.connect((host, port)) 
-    print "Connection Established......"
+    # to send file to the phone which is acting as server, connection has to be made. One may not know
+    # what the IP of the phone is, when coming in the same network, so try to connect to to all the active IPs.
+    connectFlag = False
+    activeIps = getActiveIPAddress()
+    for node in activeIps:
 
+     #looping through all the active ip address on the subnet and trying a connection.
+  
+        print "Trying to connect "+node
+        try:
+
+            port = 9998  
+
+            serversocket.connect((node, port)) 
+            print "Connection Established......"
+            connectFlag = True
+            break;
+        except socket.error as serr:
+            pass
+            print serr
+            print "Failed Establishing Connection....2"
    
-    # I made this program to transfer mp3 files from my system to phone. So it's writtent in context to that.. but it can be done
-    # for any general file 
+    # #In case all nodes were scanned but no connection was established, we start again.
+    # #But if connection is made we continue to send files
+    if not connectFlag:
+        sendFileToPhone(mp3files,serversocket)
+        #since it becomes a recursive call need to return if any of the operation is successfull.
+        return
+
+
+
     for mp3 in mp3files:
         
         #Preparing MetaData         
@@ -39,8 +97,10 @@ def sendFileToPhone(mp3files,serversocket):
         f= open(mp3,'r+b')
         l=f.read(1024*128)
         while(l):
-            serversocket.send(l)
+            a = serversocket.send(l)
+            
             l=f.read(1024*128)
+           
             print "Transferring data"
         print "File Transferred"
 
@@ -48,9 +108,7 @@ def sendFileToPhone(mp3files,serversocket):
         ack=serversocket.recv(2048)
         print ack
         
-        # you can use os.rename to move the file just transferred to the phone from current folder to any other destination folder.
-        #os.rename(mp3,destination directory +os.path.basename(mp3))
-        # destination directory is the folder where you wish to send the files to
+        os.rename(mp3,"/home/mohit/Projects/SyncPhone/CopiedSongs/"+os.path.basename(mp3))
         
         
 
@@ -58,27 +116,35 @@ def sendFileToPhone(mp3files,serversocket):
     serversocket.close()
 
 
-# Continously checks if there is any file in the folder which is syced with the phone. If there is then it makes a socket connection and
-# send it to the phone immediately.
 
 while True:
-    #Apart from sending mp3 files you can add different extension formats to send the files.
-    #listdir('.') assumes that all files are in the same folder as this script, you can change it to whichever folder you would to sync.
-    mp3files = [f for f in listdir('.') if f.endswith((".pdf",".zip",".mp3",".webm"))]
+    mp3files = ['/home/mohit/Projects/SyncPhone/Songs/'+f for f in listdir("/home/mohit/Projects/SyncPhone/Songs") if f.endswith((".pdf",".zip",".mp3",".webm"))]
     if len(mp3files) == 0:
         print "No files"
         time.sleep(20)
     else:
         print "Files Found"
-        try:           
+
+        #this set of try catch will handle error at time of file transfer.
+        try:
             print "Establishing Connection...."
             serversocket = socket.socket(
             socket.AF_INET, socket.SOCK_STREAM)
+            
+            # so_sndtime to ask for non blocking operation in case send statement blocks for some reason and restart the process all
+            # if phone out of network, send statements blocks. using so_sndtime restarts the process.
+            # over again.  Using so_sndtime gives three error if message send/receive or connect fails after setout time.
+            # EAGAIN - "Resource temporarily unavailable" https://stackoverflow.com/questions/14370489/what-can-cause-a-resource-temporarily-unavailable-on-sock-send-command
+            # EINPROGRESS - "Operation Now in progress" at the call() method https://stackoverflow.com/questions/6202454/operation-now-in-progress-error-on-connect-function-error
+            # EWOULDBLOCK - may be same as EAGAIN
 
-            serversocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            sendFileToPhone(mp3files,serversocket)
+
+            timeval = struct.pack('ll', 10, 10000)
+            # serversocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            serversocket.setsockopt(socket.SOL_SOCKET,socket.SO_SNDTIMEO,timeval)
+            sendFileToPhone(mp3files,serversocket)  
         except socket.error as serr:
-            print serr
-            print "Failed Establishing Connection...."
+            print "Error Message: "+ str(serr)
+            print "Failed Establishing Connection....1"
             time.sleep(2)
 

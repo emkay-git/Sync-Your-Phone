@@ -27,16 +27,22 @@ the files.</i>
 <img height="auto" width="300"  src="https://github.com/emkay-git/Sync-Your-Phone/blob/master/images/android.png"/>
 </p>
 
+## Requirements
+On system side, whose folder is to be shared.
+1. Python
+2. Nmap `sudo apt-get install nmap` should do the work.
+
 ## Usage
 1. Run the python script on the server side as `python songClient.py`. Keep it in the same folder which will act as shared folder. To run the script in background and on your system startup, you can use [upstart](https://stackoverflow.com/questions/24518522/run-python-script-at-startup-in-ubuntu).
 2. Install the app in your phone through android studio. (Right now not avaible on playstore.)
 
 ## Suggested Improvement(s)
-* To transfer file to the phone requires ip address of the phone in python script which is done by manually. So if IP address changes
-for phone then I need to manually change it in the python script. Automation of this task is needed, where script itself search
-for devices on the same network and connect to it.
-* It's a single side transfer that is from your desktop/laptop to phone. Other way round can be built, using the same programs or
-different program.
+* ~~To transfer file to the phone requires ip address of the phone in python script which is done by manually. So if IP address changes for phone then I need to manually change it in the python script. Automation of this task is needed, where script itself search for devices on the same network and connect to it.~~ 
+
+Using Nmap to scan the addresses. So one dependecy now is that system should have nmap for this app to work.
+* Any file inside the shared folder will be transferred. Sending an entire folder to the phone hasn't been looked after
+yet. That feature is to be taken care of.
+* It's a single side transfer that is from your desktop/laptop to phone. Other way round can be built, using the same programs/app or different program/app.
 * App uses a button to start the service. App should start the service automatically on startup of phone.
 * More options may be added in the app to make user customization better.
 * Make app good enough to be packaged into android store.
