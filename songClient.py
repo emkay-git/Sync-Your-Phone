@@ -108,7 +108,7 @@ def sendFileToPhone(mp3files,serversocket):
         ack=serversocket.recv(2048)
         print ack
         
-        os.rename(mp3,"/home/mohit/Projects/SyncPhone/CopiedSongs/"+os.path.basename(mp3))
+        os.rename(mp3,destinationFolder+os.path.basename(mp3))
         
         
 
@@ -118,7 +118,7 @@ def sendFileToPhone(mp3files,serversocket):
 
 
 while True:
-    mp3files = ['/home/mohit/Projects/SyncPhone/Songs/'+f for f in listdir("/home/mohit/Projects/SyncPhone/Songs") if f.endswith((".pdf",".zip",".mp3",".webm"))]
+    mp3files = [f for f in listdir(".") if f.endswith((".pdf",".zip",".mp3",".webm"))]
     if len(mp3files) == 0:
         print "No files"
         time.sleep(20)
