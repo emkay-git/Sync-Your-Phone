@@ -31,13 +31,109 @@ class Worker implements Runnable
     BufferedInputStream br=null;
     PrintWriter out=null;
     BufferedOutputStream bufferOut;
+    boolean terminateFlag = false;
+
+
+    public void setTerminateFlag()
+    {
+        terminateFlag = true;
+    }
+
+    public void receiveData(ServerSocket serverSocket,File musicFilePath) throws Exception
+    {
+
+
+        while(!(terminateFlag)) {
+
+            try {
+
+
+                Log.i("Log", "Waiting for Client connection...");
+                clientSocket = serverSocket.accept();
+                Log.i("Log", "Connected to Client...");
+                Log.i("Log", "Receiving Meta Data");
+
+
+                readMetaData = new BufferedReader((new InputStreamReader(clientSocket.getInputStream())));
+                out = new PrintWriter(clientSocket.getOutputStream(), true);
+                br = new BufferedInputStream(clientSocket.getInputStream());
+
+
+                String rawData = null;
+                while ((rawData = readMetaData.readLine()) != null) {
+
+                    JSONObject metaData = new JSONObject(rawData);
+                    Log.i("MetaDataContent", rawData);
+
+                    String mp3Name = metaData.getString("mp3Name");
+                    long mp3Size = Long.parseLong(metaData.getString("mp3Size"));
+
+
+                    out.println("Server:Meta Data receieved");
+
+                    Log.i("Log", "Receiving File");
+
+                    File mp3File = new File(musicFilePath, mp3Name);
+
+
+                    bufferOut = new BufferedOutputStream(new FileOutputStream(mp3File));
+
+
+                    byte[] buffer = new byte[1024 * 128];
+
+                    // Looping till we reach the end of file i.e value returned is -1 which is when socket gets closed
+                    int count = 0;
+                    int recv = 0;
+
+                    while (recv < mp3Size && (count = br.read(buffer)) > 0) {
+
+                        bufferOut.write(buffer, 0, count);
+
+                        recv += count;
+                        Log.i("Receiving", "Data" + recv + "\n");
+
+
+                    }
+                    out.println("Server: File Received");
+
+                    Log.i("Log", "Received Successfully");
+
+
+                }
+
+                br.close();
+                out.close();
+                readMetaData.close();
+                bufferOut.close();
+
+            }
+            catch (Exception e)
+            {
+
+                e.printStackTrace();
+                Log.e("ErrorLog", "" + e.getMessage());
+                Log.i("Log", "Here");
+
+            }
+
+            finally
+                {
+                // deallocating resources
+
+                    readMetaData = null;
+                    br = null;
+                    out = null;
+                    bufferOut = null;
+
+                }
+        }
+        
+
+    }
+
 
     @Override
-    public void run() {
-
-
-        try {
-
+    public void run()  {
 
             String state = Environment.getExternalStorageState();
 
@@ -47,98 +143,46 @@ class Worker implements Runnable
                 final File musicFilePath = Environment.getExternalStoragePublicDirectory(
                         Environment.DIRECTORY_MUSIC);
 
+                try {
+                    serverSocket = new ServerSocket();
+                    serverSocket.setReuseAddress(true);
+                    serverSocket.setSoTimeout(10000);
+                    serverSocket.bind(new InetSocketAddress(9998));
+                    receiveData(serverSocket,musicFilePath);
+                }
+                catch(Exception e)
+                {
 
-                serverSocket = new ServerSocket();
-                serverSocket.setReuseAddress(true);
-                serverSocket.bind(new InetSocketAddress(9998));
+                    e.printStackTrace();
+                    Log.e("ErrorLog", "" + e.getMessage());
+                    Log.i("Log", "Here");
 
-                while (true) {
-                    Log.i("Log", "Waiting for Client connection...");
-                    clientSocket = serverSocket.accept();
-                    Log.i("Log", "Connected to Client...");
-                    Log.i("Log", "Receiving Meta Data");
-
-
-                    readMetaData = new BufferedReader((new InputStreamReader(clientSocket.getInputStream())));
-                    out = new PrintWriter(clientSocket.getOutputStream(), true);
-                    br = new BufferedInputStream(clientSocket.getInputStream());
-
-
-                    String rawData = null;
-                    while ((rawData = readMetaData.readLine()) != null) {
-
-                        JSONObject metaData = new JSONObject(rawData);
-                        Log.i("MetaDataContent", rawData);
-
-                        String mp3Name = metaData.getString("mp3Name");
-                        long mp3Size = Long.parseLong(metaData.getString("mp3Size"));
-
-
-                        out.println("Server:Meta Data receieved");
-
-                        Log.i("Log", "Receiving File");
-
-                        File mp3File = new File(musicFilePath, mp3Name);
-
-
-                        bufferOut = new BufferedOutputStream(new FileOutputStream(mp3File));
-
-
-                        byte[] buffer = new byte[1024 * 128];
-
-                        // Looping till we reach the end of file i.e value returned is -1 which is when socket gets closed
-                        int count = 0;
-                        int recv = 0;
-
-                        while (recv < mp3Size && (count = br.read(buffer)) > 0) {
-
-                            bufferOut.write(buffer, 0, count);
-
-                            recv += count;
-                            Log.i("Receiving", "Data" + recv + "\n");
-
-
-                        }
-                        out.println("Server: File Received");
-
-                        Log.i("Log", "Received Successfully");
-
-
-                    }
-
-                    br.close();
-                    out.close();
-                    readMetaData.close();
-                    bufferOut.close();
 
                 }
+
+                finally{
+                    // deallocating resources
+                    try {
+                        clientSocket.close();
+                        serverSocket.close();
+                        readMetaData = null;
+                        br = null;
+                        out = null;
+                        bufferOut = null;
+
+                    } catch (Exception e) {
+                        String error = e.getMessage();
+                        if (error != null)
+                            Log.i("Try in Try", error);
+                    }
+
+                }
+
+
             }
             else Log.i("Status","SD card not available");
         }
 
-            catch(Exception e){
-                e.printStackTrace();
-                Log.e("ErrorLog", "" + e.getMessage());
-            }
-
-            finally{
-                // deallocating resources
-                try {
-                    clientSocket.close();
-                    serverSocket.close();
-                    readMetaData = null;
-                    br = null;
-                    out = null;
-                    bufferOut = null;
-
-                } catch (Exception e) {
-                    String error = e.getMessage();
-                    if (error != null)
-                        Log.i("Try in Try", error);
-         }
-            }
-
-    }
 
     public void clearResources()
     {
@@ -165,6 +209,7 @@ class Worker implements Runnable
             if(error!=null)
             Log.i("Try in Try2",error);
         }
+
     }
 
 }
@@ -176,8 +221,6 @@ public class MyService extends Service {
     Thread mythread;
     Worker runnable;
 
-    public MyService() {
-    }
 
     @Override
     public IBinder onBind(Intent arg0) {
@@ -221,7 +264,9 @@ public class MyService extends Service {
         super.onDestroy();
         Toast.makeText(this, "Service Destroyed", Toast.LENGTH_LONG).show();
 
+        runnable.setTerminateFlag();
         runnable.clearResources();
+
         mythread=null;
 
     }
