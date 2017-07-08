@@ -169,9 +169,11 @@ def connectToServer(serversocket):
 
 
 while True:
+
     # mp3files = ['/home/mohit/Projects/SyncPhone/Songs/'+f for f in listdir("/home/mohit/Projects/SyncPhone/Songs") if f.endswith((".pdf",".zip",".mp3",".webm"))]
     setFilesAndFolder('','.')
     if len(fileNameLoc) == 0:
+
         print "No files"
         time.sleep(20)
     else:
