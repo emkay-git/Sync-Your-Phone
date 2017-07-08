@@ -7,6 +7,9 @@ from os.path import isfile, join
 import json
 import subprocess,struct
 
+# populated by all the files present in the shared folder to be sent.
+fileNameLoc = []
+
 
 def getMachineIPAddress():
     #connecting with google nameserver and then finding ip of this machine.
@@ -44,44 +47,58 @@ def getActiveIPAddress():
     return activeIp
 
 
-def sendFileToPhone(mp3files,serversocket):
-    
 
-    # to send file to the phone which is acting as server, connection has to be made. One may not know
-    # what the IP of the phone is, when coming in the same network, so try to connect to to all the active IPs.
-    connectFlag = False
-    activeIps = getActiveIPAddress()
-    for node in activeIps:
-
-     #looping through all the active ip address on the subnet and trying a connection.
-  
-        print "Trying to connect "+node
-        try:
-
-            port = 9998  
-
-            serversocket.connect((node, port)) 
-            print "Connection Established......"
-            connectFlag = True
-            break;
-        except socket.error as serr:
-            pass
-            print serr
-            print "Failed Establishing Connection....2"
-   
-    # #In case all nodes were scanned but no connection was established, we start again.
-    # #But if connection is made we continue to send files
-    if not connectFlag:
-        sendFileToPhone(mp3files,serversocket)
-        #since it becomes a recursive call need to return if any of the operation is successfull.
+def setFilesAndFolder(files,path):
+    ## this program recursively travels to get the file name. It populates the fileNameLoc variable.
+    if os.path.isfile(path+files):
+        fileNameLoc.append((files,path,'n'))
+        # print "Directory: "+path+"; File Name: "+files 
         return
+    path = path+files
+    files = [f for f in os.listdir(path) if not f.startswith('.') and not f.endswith('.py')]
+    if len(files) == 0 and path is not '.':
+        fileNameLoc.append(('',path,'y'))
+        # print "Only Directory "+ path
+    else: 
+        for f in files:
+            setFilesAndFolder(f,path+'/')
+
+def moveFilesAndFolder():
+    print "Moving files and folder"
+    for (f,direc,y) in fileNameLoc:
+        print direc+f
+        try:
+            os.makedirs('../CopiedSongs/'+direc)
+        except OSError as err:
+            pass
+
+        if f is not '':
+            os.rename(direc+f,'../CopiedSongs/'+direc+f)
+   
+    for (f,direc,y) in fileNameLoc:
+        try:
+            if direc is not './':
+                os.rmdir(direc)
+        except:
+            pass
+    files = [f for f in os.listdir('.') if not f.startswith('.') and not f.endswith('.py')]
+    for f in files:
+        print f
+        if f is not '.' and f is not './':
+            os.rmdir(f)
 
 
+def sendFileToPhone(serversocket):
 
-    for mp3 in mp3files:
+    print fileNameLoc
+    for (mp3,direc,empty) in fileNameLoc:
         
         #Preparing MetaData         
-        metaData={"mp3Name":os.path.basename(mp3),"mp3Size":str(os.path.getsize(mp3))}
+        if empty is 'n':
+            metaData={"mp3Name":os.path.basename(mp3),"mp3Size":str(os.path.getsize(direc+mp3)),"dirName":direc}
+        else:
+            metaData={"mp3Name":'',"mp3Size":'0',"dirName":direc}
+
         metaData=json.dumps(metaData)
         print (metaData)
         print "Sending MetaData......"
@@ -94,32 +111,67 @@ def sendFileToPhone(mp3files,serversocket):
         
         
         print "Sending mp3 File......"        
-        f= open(mp3,'r+b')
-        l=f.read(1024*128)
-        while(l):
-            a = serversocket.send(l)
-            
-            l=f.read(1024*128)
-           
-            print "Transferring data"
-        print "File Transferred"
+        if mp3 is not '':
+            f= open(direc+mp3,'r+b')
+            l=f.read(1024*1024)
+            while(l):
+                a = serversocket.send(l)
+                
+                l=f.read(1024*1024)
+               
+                print "Transferring data"
+            print "File Transferred"
 
 
         ack=serversocket.recv(2048)
         print ack
-        
-        os.rename(mp3,"/home/mohit/Projects/SyncPhone/CopiedSongs/"+os.path.basename(mp3))
-        
-        
+
+    moveFilesAndFolder()
+   
+
+def connectToServer(serversocket):
+ 
+    # to send file to the phone which is acting as server, connection has to be made. One may not know
+    # what the IP of the phone is, when coming in the same network, so try to connect to to all the active IPs.
+    connectFlag = False
+    activeIps = getActiveIPAddress()
+    for node in activeIps:
+
+     #looping through all the active ip address on the subnet and trying a connection.
+  
+        print "Trying to connect "+node
+        try:
+
+            port = 9998  
+            serversocket.connect((node, port)) 
+            print "Connection Established......"
+            connectFlag = True
+            break;
+        except socket.error as serr:
+            pass
+            print serr
+            print "Failed Establishing Connection....2"
+   
+    # #In case all nodes were scanned but no connection was established, we start again.
+    # #But if connection is made we continue to send files
+    if not connectFlag:
+        connectToServer(serversocket)
+        #since it becomes a recursive call need to return if any of the operation is successfull.
+        return
+
+    sendFileToPhone(serversocket)   
 
     serversocket.shutdown(socket.SHUT_RDWR)
     serversocket.close()
 
 
 
+
+
 while True:
-    mp3files = ['/home/mohit/Projects/SyncPhone/Songs/'+f for f in listdir("/home/mohit/Projects/SyncPhone/Songs") if f.endswith((".pdf",".zip",".mp3",".webm"))]
-    if len(mp3files) == 0:
+    # mp3files = ['/home/mohit/Projects/SyncPhone/Songs/'+f for f in listdir("/home/mohit/Projects/SyncPhone/Songs") if f.endswith((".pdf",".zip",".mp3",".webm"))]
+    setFilesAndFolder('','.')
+    if len(fileNameLoc) == 0:
         print "No files"
         time.sleep(20)
     else:
@@ -142,9 +194,13 @@ while True:
             timeval = struct.pack('ll', 10, 10000)
             # serversocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             serversocket.setsockopt(socket.SOL_SOCKET,socket.SO_SNDTIMEO,timeval)
-            sendFileToPhone(mp3files,serversocket)  
+            connectToServer(serversocket)  
+            fileNameLoc = []
         except socket.error as serr:
             print "Error Message: "+ str(serr)
             print "Failed Establishing Connection....1"
+            fileNameLoc = []
             time.sleep(2)
+
+            
 

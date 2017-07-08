@@ -62,44 +62,55 @@ class Worker implements Runnable
                 String rawData = null;
                 while ((rawData = readMetaData.readLine()) != null) {
 
+
                     JSONObject metaData = new JSONObject(rawData);
                     Log.i("MetaDataContent", rawData);
 
                     String mp3Name = metaData.getString("mp3Name");
                     long mp3Size = Long.parseLong(metaData.getString("mp3Size"));
-
+                    String dirName = metaData.getString("dirName");
 
                     out.println("Server:Meta Data receieved");
 
                     Log.i("Log", "Receiving File");
 
-                    File mp3File = new File(musicFilePath, mp3Name);
+                    //Creating directory first
+                    File dirN= new File(musicFilePath,dirName);
+                    dirN.mkdirs();
+
+                    if(mp3Size != 0)
+                    {
+                        //creating file object
+                        File mp3File = new File(musicFilePath, dirName+mp3Name);
 
 
-                    bufferOut = new BufferedOutputStream(new FileOutputStream(mp3File));
+                        bufferOut = new BufferedOutputStream(new FileOutputStream(mp3File));
 
 
-                    byte[] buffer = new byte[1024 * 128];
+                        byte[] buffer = new byte[1024 * 1024];
 
-                    // Looping till we reach the end of file i.e value returned is -1 which is when socket gets closed
-                    int count = 0;
-                    int recv = 0;
+                        // Looping till we reach the end of file i.e value returned is -1 which is when socket gets closed
+                        int count = 0;
+                        int recv = 0;
 
-                    while (recv < mp3Size && (count = br.read(buffer)) > 0) {
+                        while (recv < mp3Size && (count = br.read(buffer)) > 0) {
 
-                        bufferOut.write(buffer, 0, count);
+                            bufferOut.write(buffer, 0, count);
 
-                        recv += count;
-                        Log.i("Receiving", "Data" + recv + "\n");
+                            recv += count;
+                            Log.i("Receiving", "Data" + recv + "\n");
 
 
+                        }
+                        bufferOut.flush();
                     }
-                    out.println("Server: File Received");
+                    out.println("Server: File/Folder Receive\n");
 
                     Log.i("Log", "Received Successfully");
 
 
                 }
+
 
                 br.close();
                 out.close();
