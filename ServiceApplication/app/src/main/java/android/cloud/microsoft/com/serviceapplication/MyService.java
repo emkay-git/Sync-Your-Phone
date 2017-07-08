@@ -157,7 +157,7 @@ class Worker implements Runnable
                 try {
                     serverSocket = new ServerSocket();
                     serverSocket.setReuseAddress(true);
-                    serverSocket.setSoTimeout(10000);
+//                    serverSocket.setSoTimeout(10000);
                     serverSocket.bind(new InetSocketAddress(9998));
                     receiveData(serverSocket,musicFilePath);
                 }
