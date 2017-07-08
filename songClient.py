@@ -12,10 +12,14 @@ fileNameLoc = []
 
 
 def getMachineIPAddress():
-    #connecting with google nameserver and then finding ip of this machine.
+   #socket.inet_ntoa converts 32-bit binary packed address to dotted format.
+    #fcnt.ioctl perroms SIOCGIFADDR on file discriptor of socket obtained through s.fileno
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    s.connect(("8.8.8.8", 80))
-    ip =  s.getsockname()[0]
+    ip =  socket.inet_ntoa(fcntl.ioctl(
+        s.fileno(),
+        0x8915,  # SIOCGIFADDR #socket ioc get interface address
+        struct.pack('256s', ifname[:15])
+    )[20:24])
     s.close()
     return ip
     
