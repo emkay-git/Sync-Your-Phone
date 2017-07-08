@@ -37,11 +37,12 @@ On system side, whose folder is to be shared.
 2. Install the app in your phone through android studio. (Right now not avaible on playstore.)
 
 ## Suggested Improvement(s)
-* ~~To transfer file to the phone requires ip address of the phone in python script which is done by manually. So if IP address changes for phone then I need to manually change it in the python script. Automation of this task is needed, where script itself search for devices on the same network and connect to it.~~ 
-
-Using Nmap to scan the addresses. So one dependecy now is that system should have nmap for this app to work.
-* Any file inside the shared folder will be transferred. Sending an entire folder to the phone hasn't been looked after
-yet. That feature is to be taken care of.
+* ~~To transfer file to the phone requires ip address of the phone in python script which is done by manually. So if IP address changes for phone then I need to manually change it in the python script. Automation of this task is needed, where script itself search for devices on the same network and connect to it.~~  Using Nmap to scan the addresses. So one dependecy now is that system should have nmap for this app to work. Some other solution may be suggested.
+* ~~Any file inside the shared folder will be transferred. Sending an entire folder to the phone hasn't been looked after
+yet. That feature is to be taken care of.~~ 
+* Start/Stop the service when wifi is on/off beacause depending of wifi state only application makes sense to work.
+* Make UI may be, to show what files has been tranferred at a single place. It will be like hyper link to those file shown on the app.
+* Socket implementation is still the most basic one. Find ways to speed the transfer process or may be implement better.
 * It's a single side transfer that is from your desktop/laptop to phone. Other way round can be built, using the same programs/app or different program/app.
 * App uses a button to start the service. App should start the service automatically on startup of phone.
 * More options may be added in the app to make user customization better.
