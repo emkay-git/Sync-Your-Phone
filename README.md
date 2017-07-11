@@ -1,15 +1,17 @@
 # Sync-Your-Phone
 This combination of android app and python script helps you keep a folder of your system synced with your phone given that both are in the
-same network. More like a local one drive/google drive.
+same network.
 I personally use it mostly to sync mp3 files, which I donwload using [AutoDownloader](https://github.com/emkay-git/AutoDownloader),
 with my phone. But you can transfer any type of file to your phone.</br>
 Android App front end</br>
 <p align="center">
-<img height="auto" width="300" hspace="30" src="https://github.com/emkay-git/Sync-Your-Phone/blob/master/images/created.jpg"/>
+<!-- <img height="auto" width="300" hspace="30" src="https://github.com/emkay-git/Sync-Your-Phone/blob/master/images/created.jpg"/>
 <img height="auto" width="300" hspace="30" src="https://github.com/emkay-git/Sync-Your-Phone/blob/master/images/destroyed.jpg"/>
+ -->
+<img src = "https://github.com/emkay-git/Sync-Your-Phone/blob/master/images/service.gif"/>
 </p>
 <p align="center">
-<i>On the front end, one can start the service and close the app or stop the service to halt the app</i>
+<i>Various options which are displayed depending on the state of the service, socket connection or wifi connection.</i>
 </p>
 Python script backend</br>
 <p align="center">
@@ -46,7 +48,7 @@ In any case if data transmission is slow. Do open an issue reporting it.
 * ~~Any file inside the shared folder will be transferred. Sending an entire folder to the phone hasn't been looked after
 yet. That feature is to be taken care of.~~ Done! :heavy_check_mark:
 * ~~Start/Stop the service when wifi is on/off because app should start service only when it's connected to wifi.~~ Done! :heavy_check_mark: Need to check if there is any unexpected behaviour when broadcast receiver is killed as it's the which starts the service.
-* Make some kind of UI, to show what files has been tranferred at a single place. It will be like hyper link to those file shown on the app. Add some options to provide customization of app.
+* Make some kind of UI, to show what files has been tranferred at a single place. It will be like hyper link to those file shown on the app. Add some options to provide customization of app. ~Some indication if phone is connected to laptop.~ (Done!)
 * Improve socket implementation
 * It's a single side transfer that is from your desktop/laptop to phone. Other way round can be built, using the same programs/app or different program/app.
 * Make app good enough to be packaged into android store.

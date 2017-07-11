@@ -62,11 +62,9 @@ public class MainActivity extends AppCompatActivity implements  AppState, Observ
         TextView text = (TextView) findViewById(R.id.appState);
 
         text.setText("Connect to wifi first");
-        if(cc.isNetworkAvailable()) {
-            text.setText("Start service to share files");
-            wifiOff = false;
-        }
-            if(MyService.isRunning)
+        if(cc.isNetworkAvailable())
+        text.setText("Start service to share files");
+        if(MyService.isRunning)
         {
 
             wifiOff = false;
@@ -101,16 +99,15 @@ public class MainActivity extends AppCompatActivity implements  AppState, Observ
     }
 
     // Unbind the activity if already not when activity is going to be closed.
-//    @Override
-//    protected void onStop() {
-//        super.onStop();
-//        // Unbind from the service
-//        if (isBound) {
-//            unbindService(mConnection);
-//
-//        }
-//    }
+    @Override
+    protected void onStop() {
+        super.onStop();
+        // Unbind from the service
+        if (isBound) {
+            unbindService(mConnection);
 
+        }
+    }
     // Method to start the service using button Start Service button press.
     // It starts the socket. The message displayed in text box is obtained initially via method call
     // in onServiceConnected that in turns call isConnectedState;
@@ -241,3 +238,4 @@ public class MainActivity extends AppCompatActivity implements  AppState, Observ
        }
     }
 }
+

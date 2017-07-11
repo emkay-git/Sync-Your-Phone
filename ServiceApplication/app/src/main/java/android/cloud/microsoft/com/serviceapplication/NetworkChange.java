@@ -11,6 +11,8 @@ import android.widget.Toast;
 /**
  * Created by mohit on 8/7/17.
  */
+
+//Registers itself in observable pattern as server. and send notifications to activity.
 public class NetworkChange extends BroadcastReceiver {
 
 
@@ -33,24 +35,10 @@ public class NetworkChange extends BroadcastReceiver {
                 context.stopService(i);
                 Log.i("wifiConnectionCheck", "no");
             }
-
+//            Log.i("Wifi","Working");
+            ObservableObject.getInstance().updateValue(result);
         }
 
 
-    }
-}
-
- class CheckConnectivity {
-
-    Context context;
-
-    public CheckConnectivity(Context base) {
-        context = base;
-    }
-
-    public boolean isNetworkAvailable() {
-        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = cm.getActiveNetworkInfo();
-        return networkInfo != null && networkInfo.isConnected();
     }
 }
