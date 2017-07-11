@@ -8,7 +8,7 @@ Android App front end</br>
 <!-- <img height="auto" width="300" hspace="30" src="https://github.com/emkay-git/Sync-Your-Phone/blob/master/images/created.jpg"/>
 <img height="auto" width="300" hspace="30" src="https://github.com/emkay-git/Sync-Your-Phone/blob/master/images/destroyed.jpg"/>
  -->
-<img src = "https://github.com/emkay-git/Sync-Your-Phone/blob/master/images/service.gif"/>
+<img height="auto" width="350" src = "https://github.com/emkay-git/Sync-Your-Phone/blob/master/images/service.gif"/>
 </p>
 <p align="center">
 <i>Various options which are displayed depending on the state of the service, socket connection or wifi connection.</i>
