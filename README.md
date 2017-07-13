@@ -47,8 +47,9 @@ In any case if data transmission is slow. Do open an issue reporting it.
 * ~~To transfer file to the phone requires ip address of the phone in python script which is done by manually. So if IP address changes for phone then I need to manually change it in the python script. Automation of this task is needed, where script itself search for devices on the same network and connect to it.~~ Done! :heavy_check_mark: Using Nmap to scan the addresses. So one dependecy now is that system should have nmap for this app to work. Some other solution may be suggested.
 * ~~Any file inside the shared folder will be transferred. Sending an entire folder to the phone hasn't been looked after
 yet. That feature is to be taken care of.~~ Done! :heavy_check_mark:
-* ~~Start/Stop the service when wifi is on/off because app should start service only when it's connected to wifi.~~ Done! :heavy_check_mark: Need to check if there is any unexpected behaviour when broadcast receiver is killed as it's the which starts the service.
-* Make some kind of UI, to show what files has been tranferred at a single place. It will be like hyper link to those file shown on the app. Add some options to provide customization of app. ~Some indication if phone is connected to laptop.~ (Done!)
+* ~~Start/Stop the service when wifi is on/off because app should start service only when it's connected to wifi.~~ Done! :heavy_check_mark: 
+* ~Some indication if phone is connected to laptop, transferring data etc.~ Done! :heavy_check_mark:
+* Abilitiy to display files/folder in the app itself.
 * Improve socket implementation
 * It's a single side transfer that is from your desktop/laptop to phone. Other way round can be built, using the same programs/app or different program/app.
 * Make app good enough to be packaged into android store.
