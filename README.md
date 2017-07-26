@@ -49,7 +49,7 @@ In any case if data transmission is slow. Do open an issue reporting it.
 yet. That feature is to be taken care of.~~ Done! :heavy_check_mark:
 * ~~Start/Stop the service when wifi is on/off because app should start service only when it's connected to wifi.~~ Done! :heavy_check_mark: 
 * ~Some indication if phone is connected to laptop, transferring data etc.~ Done! :heavy_check_mark:
-* ~Abilitiy to display files/folder in the app itself.~ Have created a simple file manager, which shows the files which are shared between phone and laptop. Right now it was merged with application, Will try to develop this using concept of Fragments.
+* ~Abilitiy to display files/folder in the app itself.~ Done! :heavy_check_mark:  Have created a simple file manager, which shows the files which are shared between phone and laptop. Right now it was merged with application, Will try to develop this using concept of Fragments.
 * Improve socket implementation and lots of refactoring required.
 * It's a single side transfer that is from your desktop/laptop to phone. Other way round can be built, using the same programs/app or different program/app.
 * Make app good enough to be packaged into android store.
