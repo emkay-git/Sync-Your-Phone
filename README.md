@@ -35,7 +35,7 @@ On system side, whose folder is to be shared.
 2. Nmap `sudo apt-get install nmap` should do the work.
 
 ## Usage
-1. Run the python script on the server side as `python songClient.py`. Keep it in the same folder which will act as shared folder. To run the script in background and on your system startup, you can use [upstart](https://stackoverflow.com/questions/24518522/run-python-script-at-startup-in-ubuntu).
+1. Run the python script on the server side as `python songClient.py`. Keep it in the same folder which will act as shared folder. To run the script in background and on your system startup, you can use [upstart](https://stackoverflow.com/questions/24518522/run-python-script-at-startup-in-ubuntu). Note: Right now app won't work by running it in background because of different path issues, as path is / (root) when running it through upstart, whereas running it in the folder containing files to be shared will take that folder as root.
 2. Install the app in your phone through android studio. (Right now not avaible on playstore.)
 
 
@@ -49,8 +49,8 @@ In any case if data transmission is slow. Do open an issue reporting it.
 yet. That feature is to be taken care of.~~ Done! :heavy_check_mark:
 * ~~Start/Stop the service when wifi is on/off because app should start service only when it's connected to wifi.~~ Done! :heavy_check_mark: 
 * ~Some indication if phone is connected to laptop, transferring data etc.~ Done! :heavy_check_mark:
-* Abilitiy to display files/folder in the app itself.
-* Improve socket implementation
+* ~Abilitiy to display files/folder in the app itself.~ Have created a simple file manager, which shows the files which are shared between phone and laptop. Right now it was merged with application, Will try to develop this using concept of Fragments.
+* Improve socket implementation and lots of refactoring required.
 * It's a single side transfer that is from your desktop/laptop to phone. Other way round can be built, using the same programs/app or different program/app.
 * Make app good enough to be packaged into android store.
 
