@@ -7,7 +7,7 @@ public interface AppState {
 
     public void isConnectedState(String message);
 
-
+    public void refreshPage();
 
 
 }

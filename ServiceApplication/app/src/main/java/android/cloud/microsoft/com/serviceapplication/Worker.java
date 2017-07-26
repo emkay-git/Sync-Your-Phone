@@ -138,7 +138,7 @@ public class Worker implements Runnable
 
                 }
 
-
+                myServiceObj.refreshWindow();
                 br.close();
                 out.close();
                 readMetaData.close();

@@ -116,5 +116,10 @@ public class MyService extends Service {
 
     }
 
+    public void refreshWindow()
+    {
+        appState.refreshPage();
+    }
+
 
 }

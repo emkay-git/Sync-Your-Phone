@@ -15,9 +15,11 @@
         android:id="@+id/button2"
         android:text="Start Services"
         android:onClick="startService"
+        android:layout_marginLeft="21dp"
+        android:layout_marginStart="21dp"
         android:layout_below="@+id/appState"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="82dp" />
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
     <Button
         android:layout_width="wrap_content"
@@ -25,19 +27,37 @@
         android:text="Stop Services"
         android:id="@+id/button"
         android:onClick="stopService"
-        android:layout_below="@+id/button2"
-        android:layout_alignLeft="@+id/button2"
-        android:layout_alignStart="@+id/button2"
-        android:layout_marginTop="36dp"
-        android:layout_alignRight="@+id/button2"
-        android:layout_alignEnd="@+id/button2" />
+        android:layout_alignTop="@+id/button2"
+        android:layout_toRightOf="@+id/appState"
+        android:layout_toEndOf="@+id/appState" />
 
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="200dip"
+        android:layout_height="30dip"
         android:text="App is not ready to accept data!"
         android:id="@+id/appState"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
+
+    <android.support.v7.widget.RecyclerView
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:id="@+id/recycleView"
+        android:layout_marginTop="29dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/button2">
+
+    </android.support.v7.widget.RecyclerView>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Shared Folder"
+        android:id="@+id/textView"
+        android:layout_below="@+id/button2"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
 </RelativeLayout>

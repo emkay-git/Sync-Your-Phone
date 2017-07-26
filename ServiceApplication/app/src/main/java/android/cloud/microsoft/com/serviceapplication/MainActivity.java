@@ -1,21 +1,25 @@
 package android.cloud.microsoft.com.serviceapplication;
 
-import android.app.Service;
+import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.EditText;
 import android.widget.TextView;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -49,6 +53,14 @@ public class MainActivity extends AppCompatActivity implements  AppState, Observ
     // 2) It gets the text view and set it to "Connect to Wifi first".
     // 3) It then checks if service is already running, if it does it indicates wifi is on
     // hence binds activity to the service which then reset the text in the text box.
+
+    RecyclerView recyclerView;
+    CustomAdapter adapter;
+    //listContentArr is passed to the adapter,
+    private ArrayList<FilePOJO> listContentArr;
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,6 +88,17 @@ public class MainActivity extends AppCompatActivity implements  AppState, Observ
             bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
         }
 
+
+
+
+        recyclerView = (RecyclerView)findViewById(R.id.recycleView);
+        //LinearLayoutManager uses linear layout within recycler view.
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        //passing current instance of Activity to CustomAdapter and also instantiating CustomAdapter object adapter
+        adapter=new CustomAdapter(this,this);
+        //Method call for populating the view
+        populateRecyclerViewValues("root");
 
     }
 
@@ -240,4 +263,81 @@ public class MainActivity extends AppCompatActivity implements  AppState, Observ
 
        }
     }
+
+
+    // Each Linear layout in Recyler view will be filled up by the FilePOJO object.
+    // So it creates the array of all the files in the folder specified by fileName variable
+    // the arraylist created is passed to the adapter then.
+    // Method takes fileName which can be root or other sub folder in root.
+    public void populateRecyclerViewValues(String fileName) {
+
+
+        listContentArr = new ArrayList<>();
+
+        FileList l = new FileList(fileName);
+        String [][] data = l.getFileList();
+
+
+
+        for(int i = 0 ;i< data.length;i++) {
+
+            FilePOJO pojoObject = new FilePOJO();
+
+            pojoObject.setFileName(data[i][0]);
+            pojoObject.setDetail(data[i][1]);
+            pojoObject.setFileImage(data[i][2]);
+
+            listContentArr.add(pojoObject);
+        }
+        //We set the array to the adapter
+        adapter.setListContent(listContentArr);
+        //We in turn set the adapter to the RecyclerView
+        recyclerView.setAdapter(adapter);
+    }
+
+
+    //Method gets called whenever back button is pressed on the hardware. If I am at the root
+    // folder then it goes back in the background. If not then it goes to the previous folder.
+    @Override
+    public void onBackPressed() {
+        if(adapter.goBack())
+            moveTaskToBack(true);
+    }
+
+
+    //whenever a file is clicked it should open. This method performs that.
+    //pdf, mp3, text, image are taken care of. Need to make smarter way to guess mime types
+    // and play that.
+    public void playFile(String clickedFile,String type)
+    {
+        File file = new File(clickedFile);
+        Intent target = new Intent(Intent.ACTION_VIEW);
+        if(type.compareTo("pdf")==0)
+            target.setDataAndType(Uri.fromFile(file),"application/pdf");
+        else if(type.compareTo("mp3")==0)
+            target.setDataAndType(Uri.fromFile(file),"audio/*");
+        else if(type.compareTo("txt")==0)
+            target.setDataAndType(Uri.fromFile(file),"text/plain");
+        else
+            target.setDataAndType(Uri.fromFile(file),"image/*");
+        target.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+
+        Intent intent = Intent.createChooser(target, "Open File");
+        try {
+            startActivity(intent);
+        } catch (ActivityNotFoundException e) {
+            // Instruct the user to install a PDF reader here, or something
+        }
+    }
+
+
+    //whenever download is completed from the system layout should refresh itself, to perform that
+    // refreshPage is used, which is called when transfer is done by Worker class to method in the Service class,
+    //which finally calls this method.
+    public void refreshPage()
+    {
+        populateRecyclerViewValues("root");
+    }
+
+
 }
