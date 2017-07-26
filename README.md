@@ -57,5 +57,3 @@ yet. That feature is to be taken care of.~~ Done! :heavy_check_mark:
 ## Contribute
 Fork, make pull requests, open issues, give more ideas and suggestion to improve this app so that ultimately it can be put on playstore.
 
-## License
-This project is licensed under [MIT License](https://github.com/emkay-git/Sync-Your-Phone/blob/master/LICENSE)
