@@ -51,7 +51,7 @@ public class CustomAdapter extends RecyclerView.Adapter<android.cloud.microsoft.
 
     //The view which was created in onCreateViewHolder is now bound to data in this method. It leverages on the ViewHolder class
     // which already provides all the views so no findViewById has to be done and simply bind data.
-    // When scrolled down, onCreateViewHolder is not called but only this method, which uses recycled views.
+    // When scrolled down, onCreateViewHolder is not called but only this method which uses recycled views.
     @Override
     public void onBindViewHolder(android.cloud.microsoft.com.serviceapplication.CustomAdapter.MyViewHolder holder, int position) {
         FilePOJO list_items = list_members.get(position);
