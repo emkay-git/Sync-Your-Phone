@@ -5,9 +5,9 @@ package android.cloud.microsoft.com.serviceapplication;
  */
 public interface AppState {
 
-    public void isConnectedState(String message);
+     void isConnectedState(String message);
 
-    public void refreshPage();
+     void refreshPage();
 
 
 }

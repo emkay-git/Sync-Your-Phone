@@ -40,6 +40,7 @@ public class CustomAdapter extends RecyclerView.Adapter<android.cloud.microsoft.
         folderHistory = fh.getHistory();
     }
 
+    //create new view whenever called and set the holder attributes.
     @Override
     public android.cloud.microsoft.com.serviceapplication.CustomAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
@@ -48,8 +49,9 @@ public class CustomAdapter extends RecyclerView.Adapter<android.cloud.microsoft.
         return holder;
     }
 
-    //display the data at the specified position. Here single FilePOJO object is returned and set in the layout.
-    //This way it's done for all the layout.
+    //The view which was created in onCreateViewHolder is now bound to data in this method. It leverages on the ViewHolder class
+    // which already provides all the views so no findViewById has to be done and simply bind data.
+    // When scrolled down, onCreateViewHolder is not called but only this method, which uses recycled views.
     @Override
     public void onBindViewHolder(android.cloud.microsoft.com.serviceapplication.CustomAdapter.MyViewHolder holder, int position) {
         FilePOJO list_items = list_members.get(position);
@@ -64,7 +66,7 @@ public class CustomAdapter extends RecyclerView.Adapter<android.cloud.microsoft.
         return list_members.size();
     }
 
-
+    //since an integer value for an image has to be returned it takes up the image name and returns integer wrt that image.
     public int getImageId(String s)
     {
 
@@ -80,6 +82,7 @@ public class CustomAdapter extends RecyclerView.Adapter<android.cloud.microsoft.
 
     }
 
+    // classic ViewHolder class which caches the different views and need not be implemented again and again.
     class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView user_name, content, time;
         ImageView image;
@@ -109,7 +112,7 @@ public class CustomAdapter extends RecyclerView.Adapter<android.cloud.microsoft.
             Log.i("CustomError2", clicked);
 
             if (folderHistory.isEmpty())
-                folderHistory = fh.getHistory();
+                folderHistory = fh.getHistory(); //it returns the root of the file. MUSIC directory in this case
             String history = folderHistory.peek();
             File clickedFile = new File(history, clicked);
             Log.i("CustomError2", clickedFile.toString());
